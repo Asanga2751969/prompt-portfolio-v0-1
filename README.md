@@ -46,5 +46,64 @@ A curated collection of high-quality prompts designed for AI tools such as ChatG
 
 > 🗂️ Last updated: Day 4 of the 30-Day GPT Sprint
 >
-> Author: \[Your Name]
+> Author: \[Asanga Costa]
+# 🎓 A-Level Study Assistant
+
+An AI-powered assistant to help Edexcel A-Level students learn faster and more effectively — with clear explanations, step-by-step solutions, visual aids, and smart quizzes.
+
+---
+
+## 💡 What It Does
+
+This agent is designed to:
+
+- Explain difficult subject concepts (Physics, Chemistry, etc.)
+- Provide visuals like diagrams or simplified formulas
+- Generate mini quizzes or revision questions
+- Offer breakdowns of past paper questions
+- Guide students using the Edexcel syllabus
+
+---
+
+## 🔧 Planned Features
+
+- Interactive Q&A (powered by GPT)
+- Support for visual explanations
+- Study planner integration
+- Trend analysis of past papers
+- Custom mock paper generator
+
+---
+
+## 🚀 Current Status
+
+- ✅ Idea finalized
+- ✅ Agent spec completed
+- ✅ GitHub repo set up
+- ⏳ First prototype to be built in Day 10
+
+---
+
+## 🛠️ Tools (Exploration Phase)
+
+- Python + OpenAI API  
+- Gradio or Streamlit (for UI)  
+- PDF parser (for past paper ingestion)  
+- Basic data analysis (mock paper logic)
+
+---
+
+## 📂 Files
+
+- `agent-spec.md`: Full description of agent goals, features, and system prompt  
+- `README.md`: This file — overview of the project
+
+---
+
+## 👨‍🎓 Who It’s For
+
+Students, tutors, and parents preparing for the Edexcel A-Level or IGCSE curriculum — with a focus on creating a smoother, smarter study experience using AI.
+
+---
+
 
