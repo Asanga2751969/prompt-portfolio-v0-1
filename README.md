@@ -105,5 +105,32 @@ This agent is designed to:
 Students, tutors, and parents preparing for the Edexcel A-Level or IGCSE curriculum — with a focus on creating a smoother, smarter study experience using AI.
 
 ---
+### 🧠 A-Level Study Assistant – Agent Workflow (Markdown Flowchart)
+
+```markdown
+User Input
+   ↓
+[Topic or Question (e.g., "Explain Kirchhoff's Laws")]
+   ↓
+[System Prompt Guides AI Tone + Depth]
+   ↓
+[LLM Processes Request]
+   ↓
+┌───────────────────────────────────────────────├───────────────────────────────────────────────┐
+│ Optional Tools:            │                            │
+│ • Curriculum Filter        │                            │
+│ • Past Paper Analyzer      │  (used later in roadmap)   │
+└───────────────────────────────────────────────┘
+   ↓
+[Structured Explanation Returned]
+   ↓
+┌───────────────────────────────────────────────────────┐
+│ Optional Add-ons (future):                            │
+│ • Visual aids (diagrams, graphs)                      │
+│ • Quiz or MCQ follow-up                               │
+│ • Memory Tracker for weak topics                      │
+└───────────────────────────────────────────────┘
+   ↓
+Final Output to Student
 
 
