@@ -16,7 +16,7 @@ with open("system-prompt.txt", "w") as file:
 import openai
 
 openai.api_key = ""sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx""  # Replace with your actual key
-
+# ⚠️ Insert your real OpenAI API key above, or load it from an environment variable
 # Load system prompt from file
 with open("system-prompt.txt", "r") as file:
     system_prompt = file.read()
