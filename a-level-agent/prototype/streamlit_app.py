@@ -5,7 +5,7 @@ from openai import OpenAI
 st.title("🎓 A-Level Study Assistant")
 
 # Load the system prompt from file
-with open("system-prompt.txt", "r") as file:
+with open("prototype/system-prompt.txt", "r") as file:
     system_prompt = file.read()
 
 # Create OpenAI client using API key stored in Streamlit secrets
