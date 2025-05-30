@@ -22,4 +22,3 @@ Assistant is performing well — helpful, structured answers for Edexcel topics
 🧠 Reflection:
 The loop makes testing feel more natural and interactive. This step made the assistant feel “real.” Follow-up questions still work, though true multi-turn memory isn’t implemented yet — that’ll be next.
 
-Would you like me to generate this as a file for direct copy-paste into your docs/ folder? Or are you comfortable adding it manually to your journal now?
