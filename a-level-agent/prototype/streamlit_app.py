@@ -1,31 +1,36 @@
 import streamlit as st
-from openai import OpenAI
+import openai
+import os
 
-# Title of the app
-st.title("🎓 A-Level Study Assistant")
+# Load OpenAI API key from Streamlit secrets
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Load the system prompt from file
+# Load the system prompt
 with open("a-level-agent/prototype/system-prompt.txt", "r") as file:
     system_prompt = file.read()
 
-# Create OpenAI client using API key stored in Streamlit secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Streamlit page setup
+st.set_page_config(page_title="A-Level Study Assistant", page_icon="🎓")
+st.title("🎓 A-Level Study Assistant")
+st.write("Ask a question related to your A-Level subjects.")
 
-# Input box for user question
-user_input = st.text_input("Ask a question about your A-Level subject:")
+# User input
+user_question = st.text_input("Enter your question here:", placeholder="e.g., Explain Newton's third law")
 
-# If there's user input, call the assistant
-if user_input:
+# Button to trigger response
+if st.button("Get Answer") and user_question:
     with st.spinner("Thinking..."):
         try:
-            response = client.chat.completions.create(
+            response = openai.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_input}
+                    {"role": "user", "content": user_question}
                 ]
             )
-            st.success(response.choices[0].message.content)
+            answer = response.choices[0].message.content
+            st.success("✅ Answer Ready:")
+            st.write(answer)
         except Exception as e:
-            st.error(f"An error occurred: {e}")
-
+            st.error("❌ Something went wrong.")
+            st.exception(e)
