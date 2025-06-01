@@ -6,7 +6,7 @@ import os
 st.set_page_config(page_title="📘 A-Level Study Assistant", layout="centered")
 
 # Sidebar: Subject and Level selection
-st.sidebar.markdown("### 🛠️ Settings")
+st.sidebar.markdown("### 🛠️ Settings Panel")
 subject = st.sidebar.selectbox("Select Subject", ["Physics", "Biology", "Chemistry", "Mathematics", "Economics"])
 level = st.sidebar.radio("Study Level", ["AS Level", "A Level"])
 
