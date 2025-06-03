@@ -39,14 +39,7 @@ if user_question:
 
         # Styled display of AI response
         st.markdown("### 📘 AI Tutor Response")
-        st.markdown(
-            f"""
-            <div style='background-color:#f9f9f9; padding:15px; border-radius:10px; border:1px solid #ddd; overflow-x:auto'>
-                {response.choices[0].message.content}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+st.markdown(response.choices[0].message.content)
 
     except Exception as e:
         st.error(f"⚠️ Something went wrong: {e}")
