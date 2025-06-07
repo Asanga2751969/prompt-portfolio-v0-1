@@ -14,12 +14,14 @@ st.sidebar.title("🛠️ Settings Panel")
 subject = st.sidebar.selectbox("Select Subject", ["Physics", "Mathematics", "Biology", "Chemistry", "Economics"])
 level = st.sidebar.selectbox("Select Study Level", ["AS Level", "A Level (Full)"])
 
-# Dynamic system prompt
+# Dynamic system prompt (enhanced for memory consistency)
 system_prompt = (
     f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
-    "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
-    "Make concepts beginner-friendly but academically accurate."
+    "Always use the previous conversation for context. Do not switch topics unless asked. "
+    "Give concise, exam-focused explanations with examples, and use a friendly tone appropriate for A-Level students. "
+    "If the user asks for follow-up or examples, ensure they relate directly to the previous topic."
 )
+
 
 # Initialize memory
 if "history" not in st.session_state:
