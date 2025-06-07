@@ -27,10 +27,13 @@ system_prompt = (
 if "history" not in st.session_state:
     st.session_state["history"] = [{"role": "system", "content": system_prompt}]
 
-# Input prompt
-prompt = st.text_input("Ask a study question:")
+# --- User Input via Form ---
+with st.form("question_form"):
+    prompt = st.text_input("Ask a study question:")
+    submitted = st.form_submit_button("Submit")
 
-if prompt:
+# --- Handle the prompt submission ---
+if submitted and prompt:
     # Add user message
     st.session_state["history"].append({"role": "user", "content": prompt})
 
@@ -48,7 +51,7 @@ if prompt:
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-# Display chat history
+# --- Display chat history ---
 if st.session_state["history"]:
     st.markdown("### 🧠 Chat History")
     for msg in st.session_state["history"]:
@@ -56,12 +59,3 @@ if st.session_state["history"]:
             st.markdown(f"**👤 You:** {msg['content']}")
         elif msg["role"] == "assistant":
             st.markdown(f"**🤖 Tutor:** {msg['content']}")
-
-
-
-
-
-
-
-
-     
