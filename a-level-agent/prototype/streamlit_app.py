@@ -2,58 +2,55 @@ import streamlit as st
 import openai
 import os
 
-# Set page config
-st.set_page_config(page_title="A-Level Study Assistant", page_icon="🎓")
+# Page config
+st.set_page_config(page_title="A-Level Study Assistant", layout="wide")
 
-# Load API key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-client = openai
+# Sidebar settings
+st.sidebar.markdown("### 🛠️ Settings Panel")
+subject = st.sidebar.selectbox("Select Subject", ["Physics", "Biology", "Chemistry", "Mathematics", "Economics"])
+level = st.sidebar.selectbox("Select Study Level", ["AS Level", "A2 Level", "Full A Level"])
 
-# Sidebar configuration
-st.sidebar.title("🛠️ Settings Panel")
-subject = st.sidebar.selectbox("Select Subject", ["Physics", "Mathematics", "Biology", "Chemistry", "Economics"])
-level = st.sidebar.selectbox("Select Study Level", ["AS Level", "A Level (Full)"])
-
-# Dynamic system prompt (enhanced for memory consistency)
-system_prompt = (
-    f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
-    "Always use the previous conversation for context. Do not switch topics unless asked. "
-    "Give concise, exam-focused explanations with examples, and use a friendly tone appropriate for A-Level students. "
-    "If the user asks for follow-up or examples, ensure they relate directly to the previous topic."
-)
-
+# Input field
+st.markdown("# 📚 A-Level AI Study Assistant")
+prompt = st.text_input("Ask a question related to your subject:")
 
 # Initialize memory
 if "history" not in st.session_state:
-    st.session_state["history"] = [{"role": "system", "content": system_prompt}]
+    st.session_state["history"] = []
 
-# Main interface
-st.title("🎓 A-Level Study Assistant")
-st.markdown("Ask your subject questions below and get exam-focused, beginner-friendly answers.")
+# Create dynamic system prompt
+system_prompt = (
+    f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
+    "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
+    "Make concepts beginner-friendly but academically accurate."
+)
 
-user_question = st.text_input("📘 Enter your question")
+# Build full message history
+messages = [{"role": "system", "content": system_prompt}]
+for entry in st.session_state["history"]:
+    messages.append({"role": "user", "content": entry["user"]})
+    messages.append({"role": "assistant", "content": entry["assistant"]})
 
-# Reset conversation
-if st.button("🧹 Start New Topic"):
-    st.session_state["history"] = [{"role": "system", "content": system_prompt}]
-    st.success("Memory cleared. Start a new topic!")
+# Add latest user message
+if prompt:
+    messages.append({"role": "user", "content": prompt})
 
-if user_question:
-    # Add user question to memory
-    st.session_state["history"].append({"role": "user", "content": user_question})
-
-    # Get response
     try:
-        response = client.chat.completions.create(
+        # Load API key securely
+        openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+        # Get model response
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=st.session_state["history"]
+            messages=messages
         )
+
         assistant_reply = response.choices[0].message.content
 
-        # Add assistant reply to memory
-        st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
+        # Save current exchange to history
+        st.session_state["history"].append({"user": prompt, "assistant": assistant_reply})
 
-        # Display answer
+        # Display AI response
         st.markdown("### 📘 AI Tutor Response")
         st.markdown(
             f"""
@@ -65,7 +62,9 @@ if user_question:
         )
 
     except Exception as e:
-        st.error(f"⚠️ Error generating response: {str(e)}")
+        st.error(f"⚠️ An error occurred: {str(e)}")
+
+
 
 
 
