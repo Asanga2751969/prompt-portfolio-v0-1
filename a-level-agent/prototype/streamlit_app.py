@@ -3,66 +3,62 @@ import openai
 import os
 
 # Page config
-st.set_page_config(page_title="A-Level Study Assistant", layout="wide")
+st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
+
+st.title("📘 A-Level Study Assistant")
 
 # Sidebar settings
 st.sidebar.markdown("### 🛠️ Settings Panel")
-subject = st.sidebar.selectbox("Select Subject", ["Physics", "Biology", "Chemistry", "Mathematics", "Economics"])
-level = st.sidebar.selectbox("Select Study Level", ["AS Level", "A2 Level", "Full A Level"])
+subject = st.sidebar.selectbox("Select subject", ["Physics", "Biology", "Mathematics", "Economics"])
+level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
 
-# Input field
-st.markdown("# 📚 A-Level AI Study Assistant")
-prompt = st.text_input("Ask a question related to your subject:")
-
-# Initialize memory
-if "history" not in st.session_state:
+# Reset chat button
+if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
-# Create dynamic system prompt
+# Dynamic system prompt
 system_prompt = (
     f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
     "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
     "Make concepts beginner-friendly but academically accurate."
 )
 
-# Build full message history
-messages = [{"role": "system", "content": system_prompt}]
-for entry in st.session_state["history"]:
-    messages.append({"role": "user", "content": entry["user"]})
-    messages.append({"role": "assistant", "content": entry["assistant"]})
+# Initialize memory
+if "history" not in st.session_state:
+    st.session_state["history"] = [{"role": "system", "content": system_prompt}]
 
-# Add latest user message
+# Input prompt
+prompt = st.text_input("Ask a study question:")
+
 if prompt:
-    messages.append({"role": "user", "content": prompt})
+    # Add user message
+    st.session_state["history"].append({"role": "user", "content": prompt})
 
     try:
-        # Load API key securely
-        openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-        # Get model response
-        response = openai.chat.completions.create(
+        client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=messages
+            messages=st.session_state["history"]
         )
-
         assistant_reply = response.choices[0].message.content
 
-        # Save current exchange to history
-        st.session_state["history"].append({"user": prompt, "assistant": assistant_reply})
-
-        # Display AI response
-        st.markdown("### 📘 AI Tutor Response")
-        st.markdown(
-            f"""
-            <div style='background-color:#f9f9f9; padding:15px; border-radius:10px; border:1px solid #ddd; overflow-x:auto'>
-                {assistant_reply}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        # Add assistant message
+        st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
     except Exception as e:
-        st.error(f"⚠️ An error occurred: {str(e)}")
+        st.error(f"❌ API Error: {e}")
+
+# Display chat history
+if st.session_state["history"]:
+    st.markdown("### 🧠 Chat History")
+    for msg in st.session_state["history"]:
+        if msg["role"] == "user":
+            st.markdown(f"**👤 You:** {msg['content']}")
+        elif msg["role"] == "assistant":
+            st.markdown(f"**🤖 Tutor:** {msg['content']}")
+
+
+
 
 
 
