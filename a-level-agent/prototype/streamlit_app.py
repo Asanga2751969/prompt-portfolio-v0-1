@@ -1,48 +1,52 @@
+import os
 import streamlit as st
 import openai
-import os
 
-# Set page configuration
-st.set_page_config(page_title="📘 A-Level Study Assistant", layout="centered")
+# Load API key from Streamlit secrets
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Sidebar: Subject and Level selection
-st.sidebar.markdown("### 🛠️ Settings Panel")
-subject = st.sidebar.selectbox("Select Subject", ["Physics", "Biology", "Chemistry", "Mathematics", "Economics"])
-level = st.sidebar.radio("Study Level", ["AS Level", "A Level"])
-
-# Input field for question
+# Set up page
+st.set_page_config(page_title="📚 A-Level Study Assistant", layout="wide")
 st.title("🎓 A-Level Study Assistant")
-st.markdown("Ask any subject-related question and get a study-friendly response.")
-user_question = st.text_input("✏️ Enter your question here:")
+st.markdown("Ask any A-Level subject question and get a concise, exam-focused explanation!")
 
-# Only proceed if a question is entered
-if user_question:
-    # Build dynamic system prompt
-    system_prompt = (
-        f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
-        "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
-        "Make concepts beginner-friendly but academically accurate."
-    )
+# Sidebar for settings
+st.sidebar.markdown("### 🛠️ Settings Panel")
+subject = st.sidebar.selectbox("Select Subject", ["Physics", "Math", "Biology", "Economics", "Chemistry"])
+level = st.sidebar.radio("Exam Level", ["AS", "A2", "Full A-Level"])
 
-    # Authenticate via secrets
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+# Input field
+user_input = st.text_input("🔍 Enter your study question:")
 
-    # Call OpenAI API
+# Dynamic system prompt based on settings
+system_prompt = (
+    f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
+    "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
+    "Make concepts beginner-friendly but academically accurate."
+)
+
+# If user submits question
+if user_input:
     try:
+        # Call OpenAI API
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_question}
+                {"role": "user", "content": user_input}
             ]
         )
 
-        # Styled display of AI response
+        # Display response
         st.markdown("### 📘 AI Tutor Response")
-st.markdown(response.choices[0].message.content)
+        try:
+            st.markdown(response.choices[0].message.content)
+        except Exception as e:
+            st.error(f"❌ Error displaying response: {e}")
 
     except Exception as e:
-        st.error(f"⚠️ Something went wrong: {e}")
+        st.error(f"❌ API error: {e}")
+
 
 
      
