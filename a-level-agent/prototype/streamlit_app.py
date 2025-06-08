@@ -7,7 +7,7 @@ st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
 
 st.title("📘 A-Level Study Assistant")
 
-st.info("👈 Tap the menu icon to open the settings panel (subject & exam level).")
+st.info("👈 Tap the menu icon on the top left corner to select subject and exam, and to start a new question session.")
 # Sidebar settings
 st.sidebar.markdown("### 🛠️ Settings Panel")
 subject = st.sidebar.selectbox("Select subject", ["Physics", "Biology", "Mathematics", "Economics"])
