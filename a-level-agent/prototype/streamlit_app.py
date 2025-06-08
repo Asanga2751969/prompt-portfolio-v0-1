@@ -5,7 +5,7 @@ import os
 # Page config
 st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
 
-st.info("👆 Tap the menu icon on the top left to select subject, exam level, or to start a new chat.")
+st.info("☝️ Tap the menu icon on the top left to select subject, exam level, or to start a new chat.")
 st.title("📘 A-Level Study Assistant")
 
 # Sidebar settings
