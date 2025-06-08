@@ -7,12 +7,13 @@ st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
 
 st.title("📘 A-Level Study Assistant")
 
+st.info("👈 Tap the menu icon to open the settings panel (subject & exam level).")
 # Sidebar settings
 st.sidebar.markdown("### 🛠️ Settings Panel")
 subject = st.sidebar.selectbox("Select subject", ["Physics", "Biology", "Mathematics", "Economics"])
 level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
 # 🧭 Mobile user tip
-st.info("👈 Tap the menu icon to open the settings panel (subject & exam level).")
+
 
 # Reset chat button
 if st.sidebar.button("🔄 Reset Chat"):
