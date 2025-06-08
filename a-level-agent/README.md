@@ -3,7 +3,11 @@
 An interactive AI tutor built to help students prepare for their Edexcel/Cambridge A-Level exams. Built with Streamlit + OpenAI, this tool offers concise, exam-focused explanations and examples across subjects like Physics, Economics, Biology, and more.
 
 ---
+## 👤 Author
 
+**Name:** Rasika Asanga Costa  
+**GitHub:** [Asanga2751969](https://(https://github.com/Asanga2751969)  
+**Bio:** Self-taught AI builder | A-Level dad on a mission to make exam prep smarter
 ## 🌟 Features
 
 - **Multi-subject support** – Physics, Economics, Biology, etc.
