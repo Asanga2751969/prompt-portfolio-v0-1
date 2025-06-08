@@ -25,7 +25,10 @@ An interactive AI tutor built to help students prepare for their Edexcel/Cambrid
 
 
 ---
+## 🧠 Prompt Portfolio
 
+- [Prompt Portfolio – Batch 1](prompt-portfolio-batch1.md)
+---
 ## 🧠 Example Interaction
 
 **You:** What is Newton's third law?  
