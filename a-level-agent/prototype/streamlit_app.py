@@ -1,11 +1,11 @@
 import streamlit as st
 import openai
 import os
-
+st.info("👈 Tap the menu icon on the top left to select subject, exam level, or to start a new chat.")
 # Page config
 st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
 
-st.info("👈 Tap the menu icon on the top left to select subject, exam level, or to start a new chat.")
+
 st.title("📘 A-Level Study Assistant")
 
 # Sidebar settings
