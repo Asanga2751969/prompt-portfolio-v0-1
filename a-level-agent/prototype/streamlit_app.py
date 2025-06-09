@@ -61,30 +61,23 @@ if submitted and prompt:
                 if not line:
                     continue
 
-                # Detect block-level LaTeX and render it
-                if line.startswith("[") and line.endswith("]"):
+                # Detect and render LaTeX if line looks like math
+                if (
+                    any(sym in line for sym in ["=", "^", "√", "∑", "π", "≥", "≤", "\\frac", "\\sqrt"])
+                    and all(c.isalnum() or c.isspace() or c in "=^√∑π≥≤+-*/().\\{}" for c in line)
+                ):
                     try:
-                        st.latex(line[1:-1].replace("**", "^").replace("sqrt", "\\sqrt"))
+                        st.latex(line.replace("**", "^").replace("\\*", "*"))
                         continue
                     except:
                         pass
 
-                # Detect inline LaTeX patterns and wrap in $...$
-                inline_math = re.findall(r"\\frac\{.*?\}|\\sqrt\{.*?\}|[a-zA-Z0-9\^\*/=\+\-]+", line)
-                if any("\\frac" in part or "\\sqrt" in part or "^" in part for part in inline_math):
-                    # Wrap entire line if it seems mostly math
-                    if all(" ".join(inline_math).strip() in line for part in inline_math):
-                        try:
-                            st.latex(line.replace("**", "^").replace("sqrt", "\\sqrt"))
-                            continue
-                        except:
-                            pass
-
-                # Else fallback to markdown
+                # Otherwise, render as markdown
                 st.markdown(line)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
 
 
 
