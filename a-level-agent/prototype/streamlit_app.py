@@ -56,24 +56,25 @@ if submitted and prompt:
             st.markdown("### 📘 AI Tutor Response")
 
             for line in assistant_reply.split("\n"):
-                
                 line = line.strip()
                 if not line:
                     continue
-                # Use LaTeX only on lines that are *pure math expressions*
+
+                # Use LaTeX for lines that appear to be math expressions
                 if (
                     any(sym in line for sym in ["=", "^", "√", "∑", "π", "≥", "≤"])
                     and all(c.isalnum() or c.isspace() or c in "=^√∑π≥≤+-*/()." for c in line)
-                    ):
-                try:
-                    st.latex(line.replace("**", "^").replace("sqrt", "\\sqrt"))
-                except:
-                    st.markdown(line)
+                ):
+                    try:
+                        st.latex(line.replace("**", "^").replace("sqrt", "\\sqrt"))
+                    except:
+                        st.markdown(line)
                 else:
                     st.markdown(line)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
 
 
 # --- Display chat history ---
