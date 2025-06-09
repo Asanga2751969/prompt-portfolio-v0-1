@@ -51,32 +51,14 @@ if submitted and prompt:
         # Add assistant message
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
-        # ✅ Display the assistant's response (LaTeX-friendly)
+        # ✅ Display the assistant's response using basic markdown
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
-
-            import re
-            for line in assistant_reply.split("\n"):
-                line = line.strip()
-                if not line:
-                    continue
-
-                # Detect and render LaTeX if line looks like math
-                if (
-                    any(sym in line for sym in ["=", "^", "√", "∑", "π", "≥", "≤", "\\frac", "\\sqrt"])
-                    and all(c.isalnum() or c.isspace() or c in "=^√∑π≥≤+-*/().\\{}" for c in line)
-                ):
-                    try:
-                        st.latex(line.replace("**", "^").replace("\\*", "*"))
-                        continue
-                    except:
-                        pass
-
-                # Otherwise, render as markdown
-                st.markdown(line)
+            st.markdown(assistant_reply)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
 
 
 
