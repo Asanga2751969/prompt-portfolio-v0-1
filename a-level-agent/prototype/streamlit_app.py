@@ -55,19 +55,19 @@ if submitted and prompt:
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
 
-            # Wrap math-looking lines in $$ for LaTeX rendering
-            formatted_lines = []
             for line in assistant_reply.split("\n"):
+                line = line.strip()
                 if any(sym in line for sym in ["=", "^", "√", "∑", "π", "≥", "≤"]):
-                    formatted_lines.append(f"$$ {line.strip()} $$")
+                    try:
+                        st.latex(line.replace("^", "**").replace("√", "\\sqrt"))
+                    except:
+                        st.markdown(line)
                 else:
-                    formatted_lines.append(line)
-
-            formatted_reply = "\n\n".join(formatted_lines)
-            st.markdown(formatted_reply)
+                    st.markdown(line)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
 
 # --- Display chat history ---
 if st.session_state["history"]:
