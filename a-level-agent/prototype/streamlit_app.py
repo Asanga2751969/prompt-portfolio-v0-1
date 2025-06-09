@@ -51,6 +51,11 @@ if submitted and prompt:
         # Add assistant message
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
+        # ✅ Display the assistant's response (LaTeX-friendly)
+        if assistant_reply:
+            st.markdown("### 📘 AI Tutor Response")
+            st.markdown(assistant_reply, unsafe_allow_html=False)
+
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
