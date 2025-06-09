@@ -54,7 +54,17 @@ if submitted and prompt:
         # ✅ Display the assistant's response (LaTeX-friendly)
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
-            st.markdown(assistant_reply, unsafe_allow_html=False)
+
+            # Wrap math-looking lines in $$ for LaTeX rendering
+            formatted_lines = []
+            for line in assistant_reply.split("\n"):
+                if any(sym in line for sym in ["=", "^", "√", "∑", "π", "≥", "≤"]):
+                    formatted_lines.append(f"$$ {line.strip()} $$")
+                else:
+                    formatted_lines.append(line)
+
+            formatted_reply = "\n\n".join(formatted_lines)
+            st.markdown(formatted_reply)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
