@@ -88,6 +88,7 @@ if submitted and prompt:
 
 
 
+
 # --- Display chat history ---
 if st.session_state["history"]:
     st.markdown("### 🧠 Chat History")
