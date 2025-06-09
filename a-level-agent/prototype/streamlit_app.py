@@ -48,29 +48,30 @@ if submitted and prompt:
         )
         assistant_reply = response.choices[0].message.content
 
-        # Add assistant message
+        # Add assistant message to memory
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
-        # ✅ Display the assistant's response (LaTeX-friendly)
+        # ✅ Display the assistant's response
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
 
-            for line in assistant_reply.split("\n"):
-                line = line.strip()
-                if not line:
+            import re
+
+            # Split by LaTeX blocks \[ ... \]
+            segments = re.split(r'(\\\[.*?\\\])', assistant_reply, flags=re.DOTALL)
+
+            for segment in segments:
+                segment = segment.strip()
+                if not segment:
                     continue
 
-                # Use LaTeX for lines that appear to be math expressions
-                if (
-                    any(sym in line for sym in ["=", "^", "√", "∑", "π", "≥", "≤"])
-                    and all(c.isalnum() or c.isspace() or c in "=^√∑π≥≤+-*/()." for c in line)
-                ):
-                    try:
-                        st.latex(line.replace("**", "^").replace("sqrt", "\\sqrt"))
-                    except:
-                        st.markdown(line)
+                if segment.startswith("\\[") and segment.endswith("\\]"):
+                    # This is a LaTeX block — clean and render
+                    clean_math = segment[2:-2].strip().replace("**", "^")
+                    st.latex(clean_math)
                 else:
-                    st.markdown(line)
+                    # Regular text
+                    st.markdown(segment)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
