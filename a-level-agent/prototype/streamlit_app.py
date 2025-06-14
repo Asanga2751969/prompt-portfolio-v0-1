@@ -19,16 +19,28 @@ level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
 if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
-# Dynamic system prompt
-system_prompt = (
+# Dynamic system prompt with subject-specific tuning
+base_prompt = (
     f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
     "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
     "Make concepts beginner-friendly but academically accurate."
 )
 
+# Subject-specific tuning
+subject_tone = {
+    "Physics": "Use real-world analogies, explain formulas clearly, and mention units of measurement.",
+    "Biology": "Focus on concise definitions, labeled processes, and visual analogies (e.g., 'cell = factory').",
+    "Mathematics": "Structure explanations step-by-step, with examples. Avoid overly technical language.",
+    "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
+}
+
+# Combine base prompt with subject instructions
+system_prompt = f"{base_prompt} {subject_tone.get(subject, '')}"
+
 # Initialize memory
 if "history" not in st.session_state:
     st.session_state["history"] = [{"role": "system", "content": system_prompt}]
+
 
 # --- User Input via Form ---
 with st.form("question_form"):
