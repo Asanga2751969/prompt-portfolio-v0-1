@@ -51,7 +51,15 @@ with st.form("question_form"):
 
 # --- Handle the prompt submission ---
 if submitted and prompt:
-    # Add user message
+    # ⏪ Reminder to keep assistant focused on selected subject
+    subject_reminder = {
+        "role": "system",
+        "content": f"Reminder: The selected subject is {subject}. Only answer questions relevant to {subject}. "
+                   f"If the question seems unrelated, inform the user politely and suggest switching subjects."
+    }
+    st.session_state["history"].append(subject_reminder)
+
+    # Add the user's actual question
     st.session_state["history"].append({"role": "user", "content": prompt})
 
     try:
@@ -62,10 +70,10 @@ if submitted and prompt:
         )
         assistant_reply = response.choices[0].message.content
 
-        # Add assistant message
+        # Store assistant reply
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
-        # ✅ Display the assistant's response using basic markdown
+        # Display response
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
             st.markdown(assistant_reply)
