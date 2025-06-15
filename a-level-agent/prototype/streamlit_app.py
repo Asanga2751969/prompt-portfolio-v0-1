@@ -21,7 +21,9 @@ if st.sidebar.button("🔄 Reset Chat"):
 
 # Dynamic system prompt with subject-specific tuning
 base_prompt = (
-    f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
+   f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
+    "Only answer questions relevant to this subject. "
+    "If the question seems unrelated to the selected subject, politely ask the student to switch to the correct subject in the settings panel. "
     "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
     "Make concepts beginner-friendly but academically accurate."
 )
