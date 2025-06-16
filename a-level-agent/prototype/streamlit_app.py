@@ -76,7 +76,20 @@ if submitted and prompt:
         # Display response
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
-            st.markdown(assistant_reply)
+            # Basic formatting rules to improve layout
+    formatted_reply = assistant_reply
+
+    # Ensure bullet points render correctly
+    formatted_reply = formatted_reply.replace("- ", "\n- ")
+
+    # Add spacing after colons to simulate sections
+    formatted_reply = formatted_reply.replace("Definition:", "\n\n**📘 Definition:**")
+    formatted_reply = formatted_reply.replace("Example:", "\n\n**🔍 Example:**")
+    formatted_reply = formatted_reply.replace("Exam Tip:", "\n\n**🎯 Exam Tip:**")
+    formatted_reply = formatted_reply.replace("Note:", "\n\n**📝 Note:**")
+    formatted_reply = formatted_reply.replace("Key Point:", "\n\n**✅ Key Point:**")
+
+    st.markdown(formatted_reply)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
