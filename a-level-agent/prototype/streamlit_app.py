@@ -19,16 +19,24 @@ level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
 if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
-# Dynamic system prompt with subject-specific tuning
+# --- Study Mode Selection ---
+study_mode = st.sidebar.selectbox("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
+
+# --- Base prompt ---
 base_prompt = (
-   f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
+    f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
     "Only answer questions relevant to this subject. "
     "If the question seems unrelated to the selected subject, politely ask the student to switch to the correct subject in the settings panel. "
-    "Give concise explanations with examples where appropriate. Prioritize what is needed to score high marks in exams. "
-    "Make concepts beginner-friendly but academically accurate."
 )
 
-# Subject-specific tuning
+# --- Study mode behavior ---
+mode_prompts = {
+    "Explain Mode": "Explain the topic clearly and concisely using simple language and examples. Emphasize exam-relevant concepts and make it beginner-friendly.",
+    "Quiz Mode": "Ask the student a follow-up question to test their understanding. Keep it short and focused on one concept at a time.",
+    "Past Paper Style": "Answer in the format of a model exam response. Be concise, formal, and use subject-specific terminology."
+}
+
+# --- Subject-specific tone ---
 subject_tone = {
     "Physics": "Use real-world analogies, explain formulas clearly, and mention units of measurement.",
     "Biology": "Focus on concise definitions, labeled processes, and visual analogies (e.g., 'cell = factory').",
@@ -36,8 +44,9 @@ subject_tone = {
     "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
 }
 
-# Combine base prompt with subject instructions
-system_prompt = f"{base_prompt} {subject_tone.get(subject, '')}"
+# --- Final system prompt ---
+system_prompt = f"{base_prompt} {mode_prompts[study_mode]} {subject_tone.get(subject, '')}"
+
 
 # Initialize memory
 if "history" not in st.session_state:
