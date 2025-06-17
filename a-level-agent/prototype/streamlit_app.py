@@ -19,6 +19,7 @@ level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
 if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
+
 # --- Study Mode Selection ---
 study_mode = st.sidebar.selectbox("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
 
@@ -46,6 +47,7 @@ subject_tone = {
 
 # --- Final system prompt ---
 system_prompt = f"{base_prompt} {mode_prompts[study_mode]} {subject_tone.get(subject, '')}"
+
 
 
 # Initialize memory
