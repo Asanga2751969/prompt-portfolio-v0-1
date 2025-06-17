@@ -84,26 +84,27 @@ if submitted and prompt:
         # Store assistant reply
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
-        # Display response
+        # ✅ Display the assistant's response
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
-            # Basic formatting rules to improve layout
-    formatted_reply = assistant_reply
 
-    # Ensure bullet points render correctly
-    formatted_reply = formatted_reply.replace("- ", "\n- ")
+            formatted_reply = assistant_reply
 
-    # Add spacing after colons to simulate sections
-    formatted_reply = formatted_reply.replace("Definition:", "\n\n**📘 Definition:**")
-    formatted_reply = formatted_reply.replace("Example:", "\n\n**🔍 Example:**")
-    formatted_reply = formatted_reply.replace("Exam Tip:", "\n\n**🎯 Exam Tip:**")
-    formatted_reply = formatted_reply.replace("Note:", "\n\n**📝 Note:**")
-    formatted_reply = formatted_reply.replace("Key Point:", "\n\n**✅ Key Point:**")
+            # Ensure bullet points render correctly
+            formatted_reply = formatted_reply.replace("- ", "\n- ")
 
-    st.markdown(formatted_reply)
+            # Add spacing and icons to clarify sections
+            formatted_reply = formatted_reply.replace("Definition:", "\n\n**📘 Definition:**")
+            formatted_reply = formatted_reply.replace("Example:", "\n\n**🔍 Example:**")
+            formatted_reply = formatted_reply.replace("Exam Tip:", "\n\n**🎯 Exam Tip:**")
+            formatted_reply = formatted_reply.replace("Note:", "\n\n**📝 Note:**")
+            formatted_reply = formatted_reply.replace("Key Point:", "\n\n**✅ Key Point:**")
+
+            st.markdown(formatted_reply)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
 
 
 
