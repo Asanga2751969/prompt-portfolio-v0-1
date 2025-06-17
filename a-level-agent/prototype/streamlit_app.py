@@ -46,7 +46,13 @@ subject_tone = {
 }
 
 # --- Final system prompt ---
-system_prompt = f"{base_prompt} {mode_prompts[study_mode]} {subject_tone.get(subject, '')}"
+system_prompt = (
+    f"{base_prompt} "
+    f"{mode_prompts[study_mode]} "
+    f"{subject_tone.get(subject, '')} "
+    "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'."
+)
+
 
 
 
