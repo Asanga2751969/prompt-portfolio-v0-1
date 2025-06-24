@@ -12,32 +12,29 @@ st.title("📘 A-Level Study Assistant")
 st.sidebar.markdown("### 🛠️ Settings Panel")
 subject = st.sidebar.selectbox("Select subject", ["Physics", "Biology", "Mathematics", "Economics"])
 level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
-# 🧭 Mobile user tip
-
 
 # Reset chat button
 if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
-
-# --- Study Mode Selection ---
+# Study Mode Selection
 study_mode = st.sidebar.selectbox("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
 
-# --- Base prompt ---
+# Base prompt
 base_prompt = (
     f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
     "Only answer questions relevant to this subject. "
     "If the question seems unrelated to the selected subject, politely ask the student to switch to the correct subject in the settings panel. "
 )
 
-# --- Study mode behavior ---
+# Study mode behavior
 mode_prompts = {
     "Explain Mode": "Explain the topic clearly and concisely using simple language and examples. Emphasize exam-relevant concepts and make it beginner-friendly.",
     "Quiz Mode": "Ask the student a follow-up question to test their understanding. Keep it short and focused on one concept at a time.",
     "Past Paper Style": "Answer in the format of a model exam response. Be concise, formal, and use subject-specific terminology."
 }
 
-# --- Subject-specific tone ---
+# Subject-specific tone
 subject_tone = {
     "Physics": "Use real-world analogies, explain formulas clearly, and mention units of measurement.",
     "Biology": "Focus on concise definitions, labeled processes, and visual analogies (e.g., 'cell = factory').",
@@ -45,7 +42,7 @@ subject_tone = {
     "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
 }
 
-# --- Final system prompt ---
+# Final system prompt
 system_prompt = (
     f"{base_prompt} "
     f"{mode_prompts[study_mode]} "
@@ -53,13 +50,9 @@ system_prompt = (
     "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'."
 )
 
-
-
-
 # Initialize memory
 if "history" not in st.session_state:
     st.session_state["history"] = [{"role": "system", "content": system_prompt}]
-
 
 # --- User Input via Form ---
 with st.form("question_form"):
@@ -68,7 +61,7 @@ with st.form("question_form"):
 
 # --- Handle the prompt submission ---
 if submitted and prompt:
-    # ⏪ Reminder to keep assistant focused on selected subject
+    # Reminder to stay on selected subject
     subject_reminder = {
         "role": "system",
         "content": f"Reminder: The selected subject is {subject}. Only answer questions relevant to {subject}. "
@@ -76,7 +69,7 @@ if submitted and prompt:
     }
     st.session_state["history"].append(subject_reminder)
 
-    # Add the user's actual question
+    # Add user question
     st.session_state["history"].append({"role": "user", "content": prompt})
 
     try:
@@ -90,27 +83,19 @@ if submitted and prompt:
         # Store assistant reply
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
-        # ✅ Display the assistant's response
+        # ✅ Display the assistant's response (safe for mobile)
         if assistant_reply:
-            
             st.markdown("### 📘 AI Tutor Response")
-            # Escape risky characters that may confuse JS regex engine
-            safe_reply = assistant_reply.replace("\\", "").replace("{", "").replace("}", "").replace("**", "").replace("$", "")
-            # Basic structure fallback – no emojis or markdown
+
+            # Strip risky markdown/LaTeX characters
+            safe_reply = assistant_reply.replace("\\", "").replace("{", "").replace("}", "")
+            safe_reply = safe_reply.replace("**", "").replace("$", "")
+
             for line in safe_reply.split("\n"):
-            st.write(line.strip())
-           
+                st.write(line.strip())
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
-
-
-
-
-
-
-
-
 
 # --- Display chat history ---
 if st.session_state["history"]:
@@ -120,3 +105,13 @@ if st.session_state["history"]:
             st.markdown(f"**👤 You:** {msg['content']}")
         elif msg["role"] == "assistant":
             st.markdown(f"**🤖 Tutor:** {msg['content']}")
+
+
+
+
+
+
+
+
+
+
