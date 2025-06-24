@@ -94,32 +94,27 @@ if submitted and prompt:
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
 
-            import textwrap
             formatted_reply = assistant_reply
 
-            # Ensure bullet points render correctly
+            # ✅ Basic section formatting — no regex
+            section_titles = {
+                "Definition:": "**📘 Definition:**",
+                "Example:": "**🔍 Example:**",
+                "Exam Tip:": "**🎯 Exam Tip:**",
+                "Note:": "**📝 Note:**",
+                "Key Point:": "**✅ Key Point:**"
+            }
+            for key, val in section_titles.items():
+                formatted_reply = formatted_reply.replace(key, f"\n\n{val}")
+
+            # Add line breaks for bullet points and better flow
             formatted_reply = formatted_reply.replace("- ", "\n- ")
 
-            # Add spacing and icons to clarify sections
-            formatted_reply = formatted_reply.replace("Definition:", "\n\n**📘 Definition:**")
-            formatted_reply = formatted_reply.replace("Example:", "\n\n**🔍 Example:**")
-            formatted_reply = formatted_reply.replace("Exam Tip:", "\n\n**🎯 Exam Tip:**")
-            formatted_reply = formatted_reply.replace("Note:", "\n\n**📝 Note:**")
-            formatted_reply = formatted_reply.replace("Key Point:", "\n\n**✅ Key Point:**")
-
-            # Soft-wrap long lines for better readability
-            wrapped_lines = []
-            for line in formatted_reply.split("\n"):
-                if len(line) > 120:
-                    wrapped_lines.extend(textwrap.wrap(line, width=100))
-                else:
-                    wrapped_lines.append(line)
-
-            final_output = "\n\n".join(wrapped_lines)
-            st.markdown(final_output)
+            st.markdown(formatted_reply)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
+
 
 
 
