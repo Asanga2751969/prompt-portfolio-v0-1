@@ -94,7 +94,12 @@ if submitted and prompt:
         if assistant_reply:
             
             st.markdown("### 📘 AI Tutor Response")
-            st.markdown(assistant_reply)
+            # Escape risky characters that may confuse JS regex engine
+            safe_reply = assistant_reply.replace("\\", "").replace("{", "").replace("}", "").replace("**", "").replace("$", "")
+            # Basic structure fallback – no emojis or markdown
+            for line in safe_reply.split("\n"):
+            st.write(line.strip())
+           
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
