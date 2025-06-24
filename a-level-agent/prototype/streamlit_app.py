@@ -92,25 +92,9 @@ if submitted and prompt:
 
         # ✅ Display the assistant's response
         if assistant_reply:
+            
             st.markdown("### 📘 AI Tutor Response")
-
-            formatted_reply = assistant_reply
-
-            # ✅ Basic section formatting — no regex
-            section_titles = {
-                "Definition:": "**📘 Definition:**",
-                "Example:": "**🔍 Example:**",
-                "Exam Tip:": "**🎯 Exam Tip:**",
-                "Note:": "**📝 Note:**",
-                "Key Point:": "**✅ Key Point:**"
-            }
-            for key, val in section_titles.items():
-                formatted_reply = formatted_reply.replace(key, f"\n\n{val}")
-
-            # Add line breaks for bullet points and better flow
-            formatted_reply = formatted_reply.replace("- ", "\n- ")
-
-            st.markdown(formatted_reply)
+            st.markdown(assistant_reply)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
