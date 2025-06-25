@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 import os
+import re  # For LaTeX expression detection
 
 # Page config
 st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
@@ -83,16 +84,21 @@ if submitted and prompt:
         # Store assistant reply
         st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
 
-        # ✅ Display the assistant's response (safe for mobile)
+        # ✅ Display the assistant's response with LaTeX rendering
         if assistant_reply:
             st.markdown("### 📘 AI Tutor Response")
 
-            # Strip risky markdown/LaTeX characters
-            safe_reply = assistant_reply.replace("\\", "").replace("{", "").replace("}", "")
-            safe_reply = safe_reply.replace("**", "").replace("$", "")
+            for line in assistant_reply.split("\n"):
+                line = line.strip()
 
-            for line in safe_reply.split("\n"):
-                st.write(line.strip())
+                # Render block LaTeX expressions
+                if re.match(r"^\$\$(.*?)\$\$$", line):
+                    latex_expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
+                    st.latex(latex_expr)
+
+                # Fallback: render line as markdown (supports inline math loosely)
+                else:
+                    st.markdown(line)
 
     except Exception as e:
         st.error(f"❌ API Error: {e}")
