@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 import os
-import re  # For LaTeX expression detection
+import re  # For LaTeX detection
 
 # Page config
 st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
@@ -43,12 +43,13 @@ subject_tone = {
     "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
 }
 
-# Final system prompt
+# Final system prompt (with LaTeX instruction added)
 system_prompt = (
     f"{base_prompt} "
     f"{mode_prompts[study_mode]} "
     f"{subject_tone.get(subject, '')} "
-    "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'."
+    "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'. "
+    "Use LaTeX notation for any mathematical expressions or formulas. Enclose block equations with $$...$$ for proper rendering."
 )
 
 # Initialize memory
@@ -91,12 +92,12 @@ if submitted and prompt:
             for line in assistant_reply.split("\n"):
                 line = line.strip()
 
-                # Render block LaTeX expressions
+                # Render block LaTeX expressions (e.g., $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$)
                 if re.match(r"^\$\$(.*?)\$\$$", line):
                     latex_expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
                     st.latex(latex_expr)
 
-                # Fallback: render line as markdown (supports inline math loosely)
+                # Fallback: render everything else as markdown
                 else:
                     st.markdown(line)
 
@@ -111,6 +112,7 @@ if st.session_state["history"]:
             st.markdown(f"**👤 You:** {msg['content']}")
         elif msg["role"] == "assistant":
             st.markdown(f"**🤖 Tutor:** {msg['content']}")
+
 
 
 
