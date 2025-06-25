@@ -43,16 +43,16 @@ subject_tone = {
     "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
 }
 
-# Final system prompt (includes LaTeX instruction)
+# Final system prompt (updated with strict LaTeX rules)
 system_prompt = (
     f"{base_prompt} "
     f"{mode_prompts[study_mode]} "
     f"{subject_tone.get(subject, '')} "
     "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'. "
-    "Always format any mathematical expressions or equations using proper LaTeX syntax. "
-    "Use \\frac{{a}}{{b}}, \\sqrt{{x}}, and other standard LaTeX commands. "
-    "Wrap full-line equations using double dollar signs like this: $$x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}$$. "
-    "Do not output equations as plain text. Always use LaTeX for math, even if the user doesn’t ask for it."
+    "Always format any mathematical expressions using LaTeX syntax. Use LaTeX commands like \\frac{{a}}{{b}}, \\sqrt{{x}}, and superscripts like x^2. "
+    "Wrap all standalone (block-level) math equations using double dollar signs like this: $$E = mc^2$$. "
+    "Do NOT use square brackets [ ... ] to format equations. Do NOT leave math as plain text. "
+    "Always prefer LaTeX for mathematical content, even if the user does not request it."
 )
 
 # Initialize memory
@@ -74,7 +74,7 @@ if submitted and prompt:
     }
     st.session_state["history"].append(subject_reminder)
 
-    # Automatically enhance prompt with LaTeX instruction (for all subjects or just math/physics)
+    # Automatically enhance prompt with LaTeX instruction (only for math-heavy subjects)
     enhanced_prompt = prompt.strip()
     if subject in ["Mathematics", "Physics"]:
         enhanced_prompt += " Please format any mathematical expressions using LaTeX and enclose full equations in $$...$$."
@@ -100,7 +100,7 @@ if submitted and prompt:
             for line in assistant_reply.split("\n"):
                 line = line.strip()
 
-                # Render block LaTeX expressions (e.g., $$...$$)
+                # Render block LaTeX expressions
                 if re.match(r"^\$\$(.*?)\$\$$", line):
                     latex_expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
                     st.latex(latex_expr)
@@ -120,6 +120,7 @@ if st.session_state["history"]:
             st.markdown(f"**👤 You:** {msg['content']}")
         elif msg["role"] == "assistant":
             st.markdown(f"**🤖 Tutor:** {msg['content']}")
+
 
 
 
