@@ -49,10 +49,12 @@ system_prompt = (
     f"{mode_prompts[study_mode]} "
     f"{subject_tone.get(subject, '')} "
     "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'. "
-    "Always format mathematical expressions using correct LaTeX syntax. For example, use \\frac{{b}}{{a}} instead of 'fracba'. "
-    "Wrap block equations with double dollar signs like this: $$x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}$$. "
-    "Do not leave equations unwrapped or unescaped."
+    "Always format any mathematical expressions or equations using proper LaTeX syntax. "
+    "Use \\frac{{a}}{{b}}, \\sqrt{{x}}, and other standard LaTeX commands. "
+    "Wrap full-line equations using double dollar signs like this: $$x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}$$. "
+    "Do not output equations as plain text. Always use LaTeX for math, even if the user doesn’t ask for it."
 )
+
 
 
 # Initialize memory
