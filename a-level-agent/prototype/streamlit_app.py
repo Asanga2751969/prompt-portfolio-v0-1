@@ -76,8 +76,12 @@ if submitted and prompt:
     }
     st.session_state["history"].append(subject_reminder)
 
-    # Add user question
-    st.session_state["history"].append({"role": "user", "content": prompt})
+    # Automatically add LaTeX instruction to user prompt
+    enhanced_prompt = (
+    f"{prompt.strip()} Please format any mathematical expressions using LaTeX and enclose full equations in $$...$$."
+    )
+    st.session_state["history"].append({"role": "user", "content": enhanced_prompt})
+
 
     try:
         client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
