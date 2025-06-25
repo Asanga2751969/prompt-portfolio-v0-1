@@ -43,7 +43,7 @@ subject_tone = {
     "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
 }
 
-# Final system prompt (with LaTeX instruction added)
+# Final system prompt (includes LaTeX instruction)
 system_prompt = (
     f"{base_prompt} "
     f"{mode_prompts[study_mode]} "
@@ -54,8 +54,6 @@ system_prompt = (
     "Wrap full-line equations using double dollar signs like this: $$x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}$$. "
     "Do not output equations as plain text. Always use LaTeX for math, even if the user doesn’t ask for it."
 )
-
-
 
 # Initialize memory
 if "history" not in st.session_state:
@@ -76,12 +74,13 @@ if submitted and prompt:
     }
     st.session_state["history"].append(subject_reminder)
 
-    # Automatically add LaTeX instruction to user prompt
-    enhanced_prompt = (
-    f"{prompt.strip()} Please format any mathematical expressions using LaTeX and enclose full equations in $$...$$."
-    )
-    st.session_state["history"].append({"role": "user", "content": enhanced_prompt})
+    # Automatically enhance prompt with LaTeX instruction (for all subjects or just math/physics)
+    enhanced_prompt = prompt.strip()
+    if subject in ["Mathematics", "Physics"]:
+        enhanced_prompt += " Please format any mathematical expressions using LaTeX and enclose full equations in $$...$$."
 
+    # Add enhanced user prompt
+    st.session_state["history"].append({"role": "user", "content": enhanced_prompt})
 
     try:
         client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -101,7 +100,7 @@ if submitted and prompt:
             for line in assistant_reply.split("\n"):
                 line = line.strip()
 
-                # Render block LaTeX expressions (e.g., $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$)
+                # Render block LaTeX expressions (e.g., $$...$$)
                 if re.match(r"^\$\$(.*?)\$\$$", line):
                     latex_expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
                     st.latex(latex_expr)
@@ -121,6 +120,7 @@ if st.session_state["history"]:
             st.markdown(f"**👤 You:** {msg['content']}")
         elif msg["role"] == "assistant":
             st.markdown(f"**🤖 Tutor:** {msg['content']}")
+
 
 
 
