@@ -1,85 +1,71 @@
 import streamlit as st
 import openai
-import os
-import re  # For LaTeX detection
+import re
 
-# Page config
-st.set_page_config(page_title="A-Level Study Assistant", layout="centered")
+# --- Page Configuration ---
+st.set_page_config(page_title="A-Level Study Assistant", layout="wide")
 
-st.info("☝️ Tap the menu icon on the top left to select subject, exam level, or to start a new chat.")
+# --- Title and Info Banner ---
 st.title("📘 A-Level Study Assistant")
+st.info("☝️ Use the sidebar to choose subject, level, and study mode. Tap 'Reset Chat' to start over.")
 
-# Sidebar settings
-st.sidebar.markdown("### 🛠️ Settings Panel")
-subject = st.sidebar.selectbox("Select subject", ["Physics", "Biology", "Mathematics", "Economics"])
-level = st.sidebar.selectbox("Study level", ["AS Level", "A Level"])
+# --- Sidebar ---
+st.sidebar.markdown("### 🛠️ Settings")
+subject = st.sidebar.selectbox("Subject", ["Physics", "Biology", "Mathematics", "Economics"])
+level = st.sidebar.selectbox("Exam Level", ["AS Level", "A Level"])
 
-# Reset chat button
+study_mode = st.sidebar.selectbox("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
+
+st.sidebar.markdown("---")
 if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
-# Study Mode Selection
-study_mode = st.sidebar.selectbox("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
-
-# Base prompt
+# --- System Prompt Setup ---
 base_prompt = (
     f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
-    "Only answer questions relevant to this subject. "
-    "If the question seems unrelated to the selected subject, politely ask the student to switch to the correct subject in the settings panel. "
+    "Only answer questions relevant to this subject. If the question seems unrelated, suggest switching subjects."
 )
 
-# Study mode behavior
 mode_prompts = {
-    "Explain Mode": "Explain the topic clearly and concisely using simple language and examples. Emphasize exam-relevant concepts and make it beginner-friendly.",
-    "Quiz Mode": "Ask the student a follow-up question to test their understanding. Keep it short and focused on one concept at a time.",
-    "Past Paper Style": "Answer in the format of a model exam response. Be concise, formal, and use subject-specific terminology."
+    "Explain Mode": "Explain the topic clearly using simple language and examples.",
+    "Quiz Mode": "Ask a follow-up question to test understanding. Keep it short and focused.",
+    "Past Paper Style": "Respond in the format of a model exam answer using formal, subject-specific language."
 }
 
-# Subject-specific tone
 subject_tone = {
-    "Physics": "Use real-world analogies, explain formulas clearly, and mention units of measurement.",
-    "Biology": "Focus on concise definitions, labeled processes, and visual analogies (e.g., 'cell = factory').",
-    "Mathematics": "Structure explanations step-by-step, with examples. Avoid overly technical language.",
-    "Economics": "Clarify key terms, use relatable scenarios (e.g., coffee shop for supply/demand), and highlight exam-style phrasing."
+    "Physics": "Use real-world analogies and explain formulas clearly with units.",
+    "Biology": "Provide concise definitions and labeled biological processes.",
+    "Mathematics": "Use step-by-step structure and clear examples.",
+    "Economics": "Clarify terms with relatable examples like a coffee shop scenario."
 }
 
-# Final system prompt (updated with strict LaTeX rules)
 system_prompt = (
-    f"{base_prompt} "
-    f"{mode_prompts[study_mode]} "
-    f"{subject_tone.get(subject, '')} "
-    "When helpful, organize your response using labels like 'Definition:', 'Example:', 'Exam Tip:', 'Note:', or 'Key Point:'. "
-    "Always format any mathematical expressions using LaTeX syntax. Use LaTeX commands like \\frac{{a}}{{b}}, \\sqrt{{x}}, and superscripts like x^2. "
-    "Wrap all standalone (block-level) math equations using double dollar signs like this: $$E = mc^2$$. "
-    "Do NOT use square brackets [ ... ] to format equations. Do NOT leave math as plain text. "
-    "Always prefer LaTeX for mathematical content, even if the user does not request it."
+    f"{base_prompt} {mode_prompts[study_mode]} {subject_tone.get(subject, '')} "
+    "Use labels like 'Definition:', 'Example:', or 'Exam Tip:'. "
+    "Always format mathematical content using LaTeX. Wrap full equations with double dollar signs (e.g., $$E = mc^2$$)."
 )
 
-# Initialize memory
+# --- Session State Initialization ---
 if "history" not in st.session_state:
     st.session_state["history"] = [{"role": "system", "content": system_prompt}]
 
-# --- User Input via Form ---
+# --- Question Form ---
 with st.form("question_form"):
-    prompt = st.text_input("Ask a study question:")
+    st.markdown("### ❓ Ask a Study Question")
+    prompt = st.text_area("Enter your question here:", height=100)
     submitted = st.form_submit_button("Submit")
 
-# --- Handle the prompt submission ---
+# --- Handle Submission ---
 if submitted and prompt:
-    # Reminder to stay on selected subject
-    subject_reminder = {
+    st.session_state["history"].append({
         "role": "system",
-        "content": f"Reminder: The selected subject is {subject}. Only answer questions relevant to {subject}. "
-                   f"If the question seems unrelated, inform the user politely and suggest switching subjects."
-    }
-    st.session_state["history"].append(subject_reminder)
+        "content": f"Reminder: Stick to {subject}. Suggest switching if question is unrelated."
+    })
 
-    # Automatically enhance prompt with LaTeX instruction (only for math-heavy subjects)
     enhanced_prompt = prompt.strip()
     if subject in ["Mathematics", "Physics"]:
-        enhanced_prompt += " Please format any mathematical expressions using LaTeX and enclose full equations in $$...$$."
+        enhanced_prompt += " Please format any math using LaTeX and wrap full equations in $$...$$."
 
-    # Add enhanced user prompt
     st.session_state["history"].append({"role": "user", "content": enhanced_prompt})
 
     try:
@@ -88,38 +74,30 @@ if submitted and prompt:
             model="gpt-3.5-turbo",
             messages=st.session_state["history"]
         )
-        assistant_reply = response.choices[0].message.content
-
-        # Store assistant reply
-        st.session_state["history"].append({"role": "assistant", "content": assistant_reply})
-
-        # ✅ Display the assistant's response with LaTeX rendering
-        if assistant_reply:
-            st.markdown("### 📘 AI Tutor Response")
-
-            for line in assistant_reply.split("\n"):
-                line = line.strip()
-
-                # Render block LaTeX expressions
-                if re.match(r"^\$\$(.*?)\$\$$", line):
-                    latex_expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
-                    st.latex(latex_expr)
-
-                # Fallback: render everything else as markdown
-                else:
-                    st.markdown(line)
-
+        reply = response.choices[0].message.content
+        st.session_state["history"].append({"role": "assistant", "content": reply})
+    
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-# --- Display chat history ---
+# --- Display Assistant Response ---
 if st.session_state["history"]:
     st.markdown("### 🧠 Chat History")
     for msg in st.session_state["history"]:
         if msg["role"] == "user":
             st.markdown(f"**👤 You:** {msg['content']}")
         elif msg["role"] == "assistant":
-            st.markdown(f"**🤖 Tutor:** {msg['content']}")
+            st.markdown("**🤖 Tutor:**")
+            for line in msg["content"].split("\n"):
+                line = line.strip()
+                if re.match(r"^\$\$(.*?)\$\$", line):
+                    expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
+                    st.latex(expr)
+                else:
+                    st.markdown(line)
+
+# --- Footer Padding ---
+st.write("\n" * 2)
 
 
 
