@@ -52,7 +52,7 @@ if "history" not in st.session_state:
 # --- Question Form ---
 with st.form("question_form"):
     st.markdown("### ❓ Ask a Study Question")
-    prompt = st.text_area("Enter your question here:", height=100)
+    prompt = st.text_area("Enter your question here:", height=150)
     submitted = st.form_submit_button("Submit")
 
 # --- Handle Submission ---
