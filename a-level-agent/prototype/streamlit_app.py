@@ -52,7 +52,8 @@ if "history" not in st.session_state:
 # --- Question Form ---
 with st.form("question_form"):
     st.markdown("### ❓ Ask a Study Question")
-    prompt = st.text_area("Enter your question here:", height=150)
+    st.text_area("Enter your question here:", height=180, placeholder="E.g. Explain why the acceleration due to gravity is constant near Earth's surface.")
+
     submitted = st.form_submit_button("Submit")
 
 # --- Handle Submission ---
