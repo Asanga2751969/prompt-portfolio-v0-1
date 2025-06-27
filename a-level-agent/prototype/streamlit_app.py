@@ -84,24 +84,23 @@ if submitted and prompt:
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-# --- Display Assistant Response ---
+# --- Display Chat History with Chat Bubbles ---
 if st.session_state["history"]:
     st.markdown("### 🧠 Chat History")
     for msg in st.session_state["history"]:
-        if msg["role"] == "user":
-            st.markdown(f"**👤 You:** {msg['content']}")
-        elif msg["role"] == "assistant":
-            st.markdown("**🤖 Tutor:**")
-            for line in msg["content"].split("\n"):
-                line = line.strip()
-                if re.match(r"^\$\$(.*?)\$\$", line):
-                    expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
-                    st.latex(expr)
-                else:
-                    st.markdown(line)
+        if msg["role"] in ["user", "assistant"]:
+            with st.chat_message(msg["role"]):
+                for line in msg["content"].split("\n"):
+                    line = line.strip()
+                    if re.match(r"^\$\$(.*?)\$\$", line):
+                        expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
+                        st.latex(expr)
+                    else:
+                        st.markdown(line)
 
 # --- Footer Padding ---
 st.write("\n" * 2)
+
 
 
 
