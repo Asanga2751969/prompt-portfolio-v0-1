@@ -4,87 +4,78 @@ import re
 
 # --- Page Configuration ---
 st.set_page_config(page_title="A-Level Study Assistant", layout="wide")
-
-# --- Title and Info Banner ---
 st.title("📘 A-Level Study Assistant")
-st.info("☝️ Use the sidebar to choose subject, level, and study mode. Tap 'Reset Chat' to start over.")
+st.info("Ask any A-Level or AS-Level study question. Use the sidebar to choose mode.")
 
 # --- Sidebar ---
 st.sidebar.markdown("### 🛠️ Settings")
-subject = st.sidebar.selectbox("Subject", ["Physics", "Biology", "Mathematics", "Economics"])
-level = st.sidebar.selectbox("Exam Level", ["AS Level", "A Level"])
+level = st.sidebar.selectbox("Exam Level", ["A-Level", "AS-Level"])
+study_mode = st.sidebar.radio("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
 
-study_mode = st.sidebar.selectbox("Study Mode", ["Explain Mode", "Quiz Mode", "Past Paper Style"])
-
-st.sidebar.markdown("---")
 if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["history"] = []
 
-# --- System Prompt Setup ---
-base_prompt = (
-    f"You are an expert A-Level tutor helping a student prepare for the {level} exam in {subject}. "
-    "Only answer questions relevant to this subject. If the question seems unrelated, suggest switching subjects."
-)
+# --- Prompt Components ---
+def get_base_prompt(level: str) -> str:
+    return (
+        f"You are an expert tutor helping a student prepare for their {level} exam. "
+        "Answer clearly, using A-Level depth and terminology. "
+        "Use LaTeX for any mathematical expressions (e.g., $F = ma$)."
+    )
 
-mode_prompts = {
-    "Explain Mode": "Explain the topic clearly using simple language and examples.",
-    "Quiz Mode": "Ask a follow-up question to test understanding. Keep it short and focused.",
-    "Past Paper Style": "Respond in the format of a model exam answer using formal, subject-specific language."
+MODE_PROMPTS = {
+    "Explain Mode": (
+        "You are in Explain Mode. Break down topics simply and clearly, using examples and analogies. "
+        "Emphasize understanding and key ideas."
+    ),
+    "Quiz Mode": (
+        "You are in Quiz Mode. Ask short, focused questions to test the student's understanding. "
+        "If the student requests a quiz, generate 3–5 questions on the topic."
+    ),
+    "Past Paper Style": (
+        "You are in Past Paper Style Mode. Respond in the tone and format of a model A-Level exam answer. "
+        "Be formal, concise, and subject-specific where relevant."
+    )
 }
 
-subject_tone = {
-    "Physics": "Use real-world analogies and explain formulas clearly with units.",
-    "Biology": "Provide concise definitions and labeled biological processes.",
-    "Mathematics": "Use step-by-step structure and clear examples.",
-    "Economics": "Clarify terms with relatable examples like a coffee shop scenario."
-}
+def build_system_prompt(level: str, mode: str) -> str:
+    return f"{get_base_prompt(level)} {MODE_PROMPTS[mode]}"
 
-system_prompt = (
-    f"{base_prompt} {mode_prompts[study_mode]} {subject_tone.get(subject, '')} "
-    "Use labels like 'Definition:', 'Example:', or 'Exam Tip:'. "
-    "Always format mathematical content using LaTeX. Wrap full equations with double dollar signs (e.g., $$E = mc^2$$)."
-)
-
-# --- Session State Initialization ---
+# --- Initialize Chat History ---
 if "history" not in st.session_state:
-    st.session_state["history"] = [{"role": "system", "content": system_prompt}]
+    st.session_state["history"] = []
 
 # --- Question Form ---
 with st.form("question_form"):
     st.markdown("### ❓ Ask a Study Question")
-    prompt = st.text_area(
-        "Enter your question here:", 
-        height=180, 
-        placeholder="E.g. Explain why the acceleration due to gravity is constant near Earth's surface."
+    user_input = st.text_area(
+        "Enter your question below:", 
+        height=180,
+        placeholder="E.g. Explain the difference between mitosis and meiosis."
     )
     submitted = st.form_submit_button("Submit")
 
 # --- Handle Submission ---
-if submitted and prompt:
-    st.session_state["history"].append({
-        "role": "system",
-        "content": f"Reminder: Stick to {subject}. Suggest switching if question is unrelated."
-    })
+if submitted and user_input:
+    system_prompt = build_system_prompt(level, study_mode)
 
-    enhanced_prompt = prompt.strip()
-    if subject in ["Mathematics", "Physics"]:
-        enhanced_prompt += " Please format any math using LaTeX and wrap full equations in $$...$$."
+    st.session_state["history"] = [  # Always reset system for consistent behavior
+        {"role": "system", "content": system_prompt}
+    ] + st.session_state["history"]
 
-    st.session_state["history"].append({"role": "user", "content": enhanced_prompt})
+    st.session_state["history"].append({"role": "user", "content": user_input})
 
     try:
-        client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=st.session_state["history"]
         )
-        reply = response.choices[0].message.content
+        reply = response.choices[0].message.content.strip()
         st.session_state["history"].append({"role": "assistant", "content": reply})
-    
     except Exception as e:
         st.error(f"❌ API Error: {e}")
 
-# --- Display Chat History with Chat Bubbles ---
+# --- Display Chat History ---
 if st.session_state["history"]:
     st.markdown("### 🧠 Chat History")
     for msg in st.session_state["history"]:
@@ -98,8 +89,8 @@ if st.session_state["history"]:
                     else:
                         st.markdown(line)
 
-# --- Footer Padding ---
 st.write("\n" * 2)
+
 
 
 
