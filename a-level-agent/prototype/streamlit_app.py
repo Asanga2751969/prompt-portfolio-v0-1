@@ -8,7 +8,7 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # --- Page Configuration ---
 st.set_page_config(page_title="A-Level Study Assistant", layout="wide")
 st.title("📘 A-Level Study Assistant")
-st.info("Ask any A-Level or AS-Level study question. Use the sidebar to choose mode.")
+st.info("Ask any A-Level or AS-Level study question. Use the sidebar to choose a mode.")
 
 # --- Sidebar ---
 st.sidebar.markdown("### 🛠️ Settings")
@@ -75,7 +75,41 @@ if submitted and user_input:
         )
         messages = [
             {"role": "system", "content": build_system_prompt(level, study_mode)},
-            {"role": "user", "
+            {"role": "user", "content": quiz_prompt}
+        ]
+    else:
+        messages = [
+            {"role": "system", "content": build_system_prompt(level, study_mode)},
+            {"role": "user", "content": user_input}
+        ]
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=messages
+        )
+        reply = response.choices[0].message.content.strip()
+        st.session_state["history"].append({"role": "user", "content": user_input})
+        st.session_state["history"].append({"role": "assistant", "content": reply})
+    except Exception as e:
+        st.error(f"❌ API Error: {e}")
+
+# --- Display Chat History ---
+if st.session_state["history"]:
+    st.markdown("### 🧠 Chat History")
+    for msg in st.session_state["history"]:
+        if msg["role"] in ["user", "assistant"]:
+            with st.chat_message(msg["role"]):
+                for line in msg["content"].split("\n"):
+                    line = line.strip()
+                    if re.match(r"^\$\$(.*?)\$\$", line):
+                        expr = re.findall(r"\$\$(.*?)\$\$", line)[0]
+                        st.latex(expr)
+                    else:
+                        st.markdown(line)
+
+st.write("\n" * 2)
+
 
 
 
