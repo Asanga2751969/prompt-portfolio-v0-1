@@ -1,5 +1,6 @@
 import streamlit as st
 import re
+from difflib import SequenceMatcher
 from openai import OpenAI
 
 # --- OpenAI Client ---
@@ -58,6 +59,17 @@ def extract_questions_and_answers(response_text: str) -> list:
     matches = re.findall(pattern, response_text.strip(), re.DOTALL)
     return [{"question": q.strip(), "answer": a.strip()} for _, q, a in matches]
 
+def is_answer_correct(user_answer: str, correct_answer: str, threshold=0.6) -> bool:
+    user = user_answer.strip().lower()
+    correct = correct_answer.strip().lower()
+
+    # Heuristic: avoid marking "I don't know" or empty as correct
+    if user in ["", "idk", "i don't know", "dont know"]:
+        return False
+
+    similarity = SequenceMatcher(None, user, correct).ratio()
+    return similarity >= threshold
+
 # --- Initialize Session State ---
 if "history" not in st.session_state:
     st.session_state["history"] = []
@@ -93,12 +105,11 @@ if submitted and user_input:
 
         st.session_state.quiz_answers.append(user_answer)
 
-        # Basic string match
-        if user_answer.lower() in correct_answer.lower():
-            feedback = f"✅ Correct!\n\n"
+        if is_answer_correct(user_answer, correct_answer):
+            feedback = f"✅ Correct!\n**Model answer:** {correct_answer}\n\n"
             st.session_state.quiz_score += 1
         else:
-            feedback = f"❌ Not quite. Here's the correct answer:\n**{correct_answer}**\n\n"
+            feedback = f"❌ Not quite.\n**Model answer:** {correct_answer}\n\n"
 
         st.session_state.quiz_index += 1
 
@@ -115,7 +126,10 @@ if submitted and user_input:
             for i, qa in enumerate(st.session_state.current_quiz):
                 q = qa["question"]
                 a = st.session_state.quiz_answers[i]
-                feedback += f"\n{i+1}. {q}\n**Your answer:** {a}\n**Correct:** {qa['answer']}\n"
+                correct = qa['answer']
+                is_correct = is_answer_correct(a, correct)
+                icon = "✅" if is_correct else "❌"
+                feedback += f"\n{icon} **Q{i+1}.** {q}\nYour answer: {a}\nCorrect answer: {correct}\n"
 
         st.session_state["history"].append({"role": "user", "content": user_answer})
         st.session_state["history"].append({"role": "assistant", "content": feedback})
@@ -192,6 +206,7 @@ if st.session_state["history"]:
                         st.markdown(line)
 
 st.write("\n" * 2)
+
 
 
 
