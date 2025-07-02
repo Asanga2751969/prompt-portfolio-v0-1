@@ -63,14 +63,26 @@ def is_answer_correct(user_answer: str, correct_answer: str, threshold=0.6) -> b
     user = user_answer.strip().lower()
     correct = correct_answer.strip().lower()
 
-    # Heuristic: avoid marking "I don't know" or empty as correct
+    # Block known "non-answers"
     if user in ["", "idk", "i don't know", "dont know"]:
         return False
 
+    # Check if numbers match
+    user_numbers = re.findall(r"[-+]?\d*\.?\d+", user)
+    correct_numbers = re.findall(r"[-+]?\d*\.?\d+", correct)
+
+    if user_numbers and correct_numbers:
+        try:
+            if float(user_numbers[0]) == float(correct_numbers[0]):
+                return True
+        except:
+            pass  # Fallback to fuzzy match
+
+    # Fallback: fuzzy token comparison
     similarity = SequenceMatcher(None, user, correct).ratio()
     return similarity >= threshold
 
-# --- Initialize Session State ---
+# --- Session State Initialization ---
 if "history" not in st.session_state:
     st.session_state["history"] = []
 
@@ -97,8 +109,8 @@ with st.form("question_form"):
 
 # --- Handle Submission ---
 if submitted and user_input:
-    # --- Quiz in progress: check answer ---
     if st.session_state.awaiting_quiz_answer:
+        # Quiz answer flow
         user_answer = user_input.strip()
         quiz_item = st.session_state.current_quiz[st.session_state.quiz_index]
         correct_answer = quiz_item["answer"]
@@ -113,7 +125,6 @@ if submitted and user_input:
 
         st.session_state.quiz_index += 1
 
-        # Next question or finish quiz
         if st.session_state.quiz_index < len(st.session_state.current_quiz):
             next_q = st.session_state.current_quiz[st.session_state.quiz_index]["question"]
             feedback += f"**Question {st.session_state.quiz_index + 1}:** {next_q}"
@@ -134,8 +145,8 @@ if submitted and user_input:
         st.session_state["history"].append({"role": "user", "content": user_answer})
         st.session_state["history"].append({"role": "assistant", "content": feedback})
 
-    # --- New quiz requested ---
     elif study_mode == "Quiz Mode" and is_quiz_request(user_input):
+        # New quiz requested
         quiz_prompt = (
             f"Create a quiz with exactly 3 questions for an A-Level student based on this request: '{user_input}'. "
             "For each question, include the correct answer using this format:\n\n"
@@ -173,8 +184,8 @@ if submitted and user_input:
         except Exception as e:
             st.error(f"❌ API Error: {e}")
 
-    # --- Normal study question ---
     else:
+        # General study question
         messages = [
             {"role": "system", "content": build_system_prompt(level, study_mode)},
             {"role": "user", "content": user_input}
@@ -206,6 +217,8 @@ if st.session_state["history"]:
                         st.markdown(line)
 
 st.write("\n" * 2)
+
+
 
 
 
