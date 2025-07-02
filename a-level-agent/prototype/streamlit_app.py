@@ -20,6 +20,7 @@ if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["current_quiz"] = []
     st.session_state["quiz_index"] = 0
     st.session_state["quiz_answers"] = []
+    st.session_state["quiz_score"] = 0
     st.session_state["awaiting_quiz_answer"] = False
 
 # --- Prompt Components ---
@@ -37,7 +38,7 @@ MODE_PROMPTS = {
     ),
     "Quiz Mode": (
         "You are in Quiz Mode. Ask short, focused questions to test the student's understanding. "
-        "If the student requests a quiz, generate 3–5 questions on the topic."
+        "If the student requests a quiz, generate 3–5 questions on the topic, each with the correct answer."
     ),
     "Past Paper Style": (
         "You are in Past Paper Style Mode. Respond in the tone and format of a model A-Level exam answer. "
@@ -52,10 +53,10 @@ def is_quiz_request(user_input: str) -> bool:
     quiz_keywords = ["quiz me", "test me", "give me a quiz", "mini quiz", "quick quiz"]
     return any(keyword in user_input.lower() for keyword in quiz_keywords)
 
-def extract_questions_from_response(response_text: str) -> list:
-    pattern = r"\d+\.\s+(.*?)\n"
-    questions = re.findall(pattern, response_text + "\n")  # ensure final newline
-    return questions
+def extract_questions_and_answers(response_text: str) -> list:
+    pattern = r"(\d+)\.\s+(.*?)\nAnswer:\s+(.*?)(?=\n\d+\.|\Z)"
+    matches = re.findall(pattern, response_text.strip(), re.DOTALL)
+    return [{"question": q.strip(), "answer": a.strip()} for _, q, a in matches]
 
 # --- Initialize Session State ---
 if "history" not in st.session_state:
@@ -67,12 +68,14 @@ if "quiz_index" not in st.session_state:
     st.session_state["quiz_index"] = 0
 if "quiz_answers" not in st.session_state:
     st.session_state["quiz_answers"] = []
+if "quiz_score" not in st.session_state:
+    st.session_state["quiz_score"] = 0
 if "awaiting_quiz_answer" not in st.session_state:
     st.session_state["awaiting_quiz_answer"] = False
 
 # --- Question Form ---
 with st.form("question_form"):
-    st.markdown("### ❓ Ask a Study Question")
+    st.markdown("### ❓ Ask a Study Question or Answer a Quiz")
     user_input = st.text_area(
         "Enter your question or quiz answer below:",
         height=180,
@@ -82,35 +85,47 @@ with st.form("question_form"):
 
 # --- Handle Submission ---
 if submitted and user_input:
-    # --- If student is answering a quiz question ---
+    # --- Quiz in progress: check answer ---
     if st.session_state.awaiting_quiz_answer:
         user_answer = user_input.strip()
+        quiz_item = st.session_state.current_quiz[st.session_state.quiz_index]
+        correct_answer = quiz_item["answer"]
+
         st.session_state.quiz_answers.append(user_answer)
 
-        current_index = st.session_state.quiz_index
-        total_questions = len(st.session_state.current_quiz)
-
-        feedback = f"✅ Received your answer: **{user_answer}**\n\n"
+        # Basic string match
+        if user_answer.lower() in correct_answer.lower():
+            feedback = f"✅ Correct!\n\n"
+            st.session_state.quiz_score += 1
+        else:
+            feedback = f"❌ Not quite. Here's the correct answer:\n**{correct_answer}**\n\n"
 
         st.session_state.quiz_index += 1
 
-        if st.session_state.quiz_index < total_questions:
-            next_q = st.session_state.current_quiz[st.session_state.quiz_index]
+        # Next question or finish quiz
+        if st.session_state.quiz_index < len(st.session_state.current_quiz):
+            next_q = st.session_state.current_quiz[st.session_state.quiz_index]["question"]
             feedback += f"**Question {st.session_state.quiz_index + 1}:** {next_q}"
         else:
+            total = len(st.session_state.current_quiz)
+            score = st.session_state.quiz_score
             st.session_state.awaiting_quiz_answer = False
-            feedback += "\n🎉 **Quiz complete!**\n\nHere’s a summary:"
-            for i, (q, a) in enumerate(zip(st.session_state.current_quiz, st.session_state.quiz_answers)):
-                feedback += f"\n{i+1}. {q}\n**Your answer:** {a}\n"
+
+            feedback += f"\n🎉 **Quiz complete!**\n\n**Score: {score}/{total}**\n\nSummary:"
+            for i, qa in enumerate(st.session_state.current_quiz):
+                q = qa["question"]
+                a = st.session_state.quiz_answers[i]
+                feedback += f"\n{i+1}. {q}\n**Your answer:** {a}\n**Correct:** {qa['answer']}\n"
 
         st.session_state["history"].append({"role": "user", "content": user_answer})
         st.session_state["history"].append({"role": "assistant", "content": feedback})
 
-    # --- If user requests a quiz ---
+    # --- New quiz requested ---
     elif study_mode == "Quiz Mode" and is_quiz_request(user_input):
         quiz_prompt = (
-            f"Create a short quiz of 3 to 5 questions for an A-Level student based on this request: '{user_input}'. "
-            "Only include the questions, clearly numbered. Do not include answers unless asked."
+            f"Create a quiz with exactly 3 questions for an A-Level student based on this request: '{user_input}'. "
+            "For each question, include the correct answer using this format:\n\n"
+            "1. Question text\nAnswer: correct answer\n\n2. ..."
         )
         messages = [
             {"role": "system", "content": build_system_prompt(level, study_mode)},
@@ -123,27 +138,28 @@ if submitted and user_input:
                 messages=messages
             )
             quiz_text = response.choices[0].message.content.strip()
-            quiz_questions = extract_questions_from_response(quiz_text)
+            quiz_items = extract_questions_and_answers(quiz_text)
 
-            if quiz_questions:
-                st.session_state["current_quiz"] = quiz_questions
+            if quiz_items:
+                st.session_state["current_quiz"] = quiz_items
                 st.session_state["quiz_index"] = 0
                 st.session_state["quiz_answers"] = []
+                st.session_state["quiz_score"] = 0
                 st.session_state["awaiting_quiz_answer"] = True
 
-                first_q = quiz_questions[0]
+                first_q = quiz_items[0]["question"]
                 quiz_intro = f"🧪 Here's your quiz:\n\n**Question 1:** {first_q}"
 
                 st.session_state["history"].append({"role": "user", "content": user_input})
                 st.session_state["history"].append({"role": "assistant", "content": quiz_intro})
             else:
                 st.session_state["history"].append({"role": "user", "content": user_input})
-                st.session_state["history"].append({"role": "assistant", "content": "Sorry, I couldn't extract any questions."})
+                st.session_state["history"].append({"role": "assistant", "content": "⚠️ Couldn't extract quiz questions."})
 
         except Exception as e:
             st.error(f"❌ API Error: {e}")
 
-    # --- Regular Question (not quiz-related) ---
+    # --- Normal study question ---
     else:
         messages = [
             {"role": "system", "content": build_system_prompt(level, study_mode)},
