@@ -1,53 +1,73 @@
-# 🎓 A-Level Study Assistant
+# 📘 A-Level Study Assistant
 
-An interactive AI tutor built to help students prepare for their Edexcel/Cambridge A-Level exams. Built with Streamlit + OpenAI, this tool offers concise, exam-focused explanations and examples across subjects like Physics, Economics, Biology, and more.
+An interactive AI-powered tutor built using OpenAI's GPT-3.5. Designed to help A-Level students study smarter with clear explanations, dynamic quizzes, and exam-style answers — all in a clean, mobile-friendly interface.
 
 ---
+
+## 🎯 What It Does
+
+✅ **Supports All A-Level Subjects**
+- Physics, Biology, Mathematics, and Economics
+
+✅ **Three Study Modes**
+- **Explain Mode** – clear, beginner-friendly explanations
+- **Quiz Mode** – one question at a time + feedback
+- **Past Paper Style** – formal, exam-style answers
+
+✅ **LaTeX Rendering for Math**
+- Equations display cleanly across devices (desktop + mobile)
+
+✅ **Answer Checking Engine**
+- Quiz responses are scored with ✅ / ❌ and helpful feedback
+
+✅ **Clean Chat UI**
+- Built with Streamlit 1.x, featuring real-time memory and sidebar controls
+
+---
+
+## 🧪 Live Demo
+
+👉 Try the agent here: [https://a-level-tutor.streamlit.app](https://a-level-tutor.streamlit.app)
+
+---
+
+## 📸 Screenshots
+
+| 📱 Mobile | 🖥️ Desktop |
+|----------|------------|
+| ![mobile screenshot](link-to-your-screenshot) | ![desktop screenshot](link-to-your-screenshot) |
+
+---
+
+## 💻 Tech Stack
+
+- Streamlit (Python-based UI)
+- OpenAI SDK v1.0+
+- GitHub for versioning
+- LaTeX support for math rendering
+
+---
+
+## 🛠️ Features Under Development
+
+- User score tracking
+- Personalized review suggestions
+- Custom quiz length and retry options
+- Tutor persona customization
+
+---
+
 ## 👤 Author
 
-**Name:** Rasika Asanga Costa  
-**GitHub:** [Asanga2751969](https://(https://github.com/Asanga2751969)  
-**Bio:** Self-taught AI builder | A-Level dad on a mission to make exam prep smarter
-## 🌟 Features
-
-- **Multi-subject support** – Physics, Economics, Biology, etc.
-- **Exam level selector** – AS Level or A2 (Full A Level)
-- **Follow-up memory** – Maintains context across multiple questions
-- **Beginner-friendly explanations** – Optimized for high exam scores
-- **Responsive UI** – Works on desktop and mobile
-- **Live on Streamlit Cloud** – No installation required!
+Built by **Rasika Asanga Costa**, a freelance AI developer helping educators and creators build custom GPT-powered tools.  
+🔗 [GitHub](https://github.com/your-profile) | 🌍 [Upwork Profile](https://www.upwork.com/freelancers/~01c953551454c08a8c)
 
 ---
 
-## 🚀 Try it Live
+## 📄 License
 
-👉 [Launch the Agent](https://prompt-portfolio-v0-1-fkt67e75bp4sqncymurvtw.streamlit.app/)  
+MIT License – free to adapt and build on. Just give credit.
 
-
----
-## 🧠 Prompt Portfolio
-
-- [Prompt Portfolio – Batch 1](prompt-portfolio-batch1.md)
----
-## 🧠 Example Interaction
-
-**You:** What is Newton's third law?  
-**Tutor:** Newton's third law states that for every action, there is an equal and opposite reaction...  
-**You:** Give me a real-life example  
-**Tutor:** A rocket launch — the exhaust gases push downward, and the rocket moves upward...  
-**You:** Can you give a multiple choice question based on this law?  
-**Tutor:** *What happens when a swimmer pushes off the wall...?* ✅
-
----
-
-## 🛠️ Tech Stack
-
-- **Python** + **OpenAI API (GPT-3.5-turbo)**
-- **Streamlit** for the user interface
-- **Colab** for prototyping and experimentation
-- **GitHub** for version control + documentation
-
----
 
 ## 📁 Project Structure
 
