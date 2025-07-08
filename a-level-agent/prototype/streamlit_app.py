@@ -23,6 +23,11 @@ if st.sidebar.button("🔄 Reset Chat"):
     st.session_state["quiz_answers"] = []
     st.session_state["quiz_score"] = 0
     st.session_state["awaiting_quiz_answer"] = False
+# --- Upgrade to Pro button placeholder ---
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🚀 Unlock More Features")
+if st.sidebar.button("🔓 Upgrade to Pro (Coming Soon)"):
+    st.sidebar.info("Pro features like quiz history and advanced scoring coming soon!")
 
 # --- Prompt Components ---
 def get_base_prompt(level: str) -> str:
