@@ -54,6 +54,7 @@ An interactive AI-powered tutor built using OpenAI's GPT-3.5. Designed to help A
 - Personalized review suggestions
 - Custom quiz length and retry options
 - Tutor persona customization
+- Pro options for paid users
 
 ---
 
