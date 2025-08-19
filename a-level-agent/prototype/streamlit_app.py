@@ -170,7 +170,14 @@ if submitted and user_input:
                 is_correct = is_answer_correct(a, correct)
                 icon = "✅" if is_correct else "❌"
                 feedback += f"\n{icon} **Q{i+1}.** {q}\nYour answer: {a}\nCorrect answer: {correct}\n"
-
+            # ✅ Pro-only: Append quiz attempt to quiz_log
+            if user_is_pro():
+                st.session_state["quiz_log"].append({
+                    "topic": user_input,
+                    "score": f"{st.session_state.quiz_score}/{len(st.session_state.current_quiz)}",
+                    "questions": st.session_state.current_quiz,
+                    "answers": st.session_state.quiz_answers
+                 })    
         st.session_state["history"].append({"role": "user", "content": user_answer})
         st.session_state["history"].append({"role": "assistant", "content": feedback})
 
@@ -264,10 +271,21 @@ with selected_tab[0]:
 # --- Quiz History tab (Pro) ---
 with selected_tab[1]:
     if user_is_pro():
-        st.success("📘 Your previous quizzes will appear here.")
-        # Placeholder for future quiz_log rendering
+        if "quiz_log" in st.session_state and st.session_state["quiz_log"]:
+            for i, log in enumerate(st.session_state["quiz_log"]):
+                st.markdown(f"### 📘 Quiz {i+1}: {log['topic']}")
+                st.markdown(f"**Score:** {log['score']}")
+                with st.expander("View Questions & Answers"):
+                    for j, q in enumerate(log["questions"]):
+                        st.markdown(f"**Q{j+1}.** {q['question']}")
+                        st.markdown(f"Your answer: {log['answers'][j]}")
+                        st.markdown(f"Correct answer: {q['answer']}")
+                        st.markdown("---")
+        else:
+            st.info("No quizzes logged yet. Your history will appear here after you complete a quiz.")
     else:
         pro_lock("Quiz History lets you review past attempts and track your progress.")
+
 
 # --- Past Papers tab (Pro) ---
 with selected_tab[2]:
