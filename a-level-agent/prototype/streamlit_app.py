@@ -2,6 +2,15 @@ import streamlit as st
 import re
 from difflib import SequenceMatcher
 from openai import OpenAI
+# === Pro Access Helpers ===
+
+def user_is_pro():
+    """Returns True if the user has Pro access (dev or real in future)."""
+    return st.session_state.get("is_pro", False)
+
+def pro_lock(message: str = "This feature is available in the Pro version."):
+    """Standard locked message shown to free users."""
+    st.warning(f"🔒 {message}")
 
 # --- OpenAI Client ---
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -26,8 +35,14 @@ if st.sidebar.button("🔄 Reset Chat"):
 # --- Upgrade to Pro button placeholder ---
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🚀 Unlock More Features")
+
+# Dev-only toggle to simulate Pro access
+st.sidebar.checkbox("✅ I’m Pro (dev toggle)", key="is_pro")
+
+# Upgrade button with placeholder info
 if st.sidebar.button("🔓 Upgrade to Pro (Coming Soon)"):
-    st.sidebar.info("Pro features like quiz history and advanced scoring coming soon!")
+    st.sidebar.info("Pro features like **Quiz History**, **Detailed Feedback**, and **Past Papers** coming soon!")
+
 
 # --- Prompt Components ---
 def get_base_prompt(level: str) -> str:
