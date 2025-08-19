@@ -237,6 +237,44 @@ if st.session_state["history"]:
                         st.markdown(line)
 
 st.write("\n" * 2)
+# --- 🧠 Study Tools Section ---
+st.markdown("---")
+st.markdown("## 🧠 Study Tools")
+
+selected_tab = st.tabs([
+    "Tutor",
+    "Quiz History 🔒",
+    "Past Papers 🔒",
+    "Detailed Feedback 🔒"
+])
+
+# --- Tutor tab (Free) ---
+with selected_tab[0]:
+    st.markdown("You're in the main Tutor area. Ask any question!")
+
+# --- Quiz History tab (Pro) ---
+with selected_tab[1]:
+    if user_is_pro():
+        st.success("📘 Your previous quizzes will appear here.")
+        # Placeholder for future quiz_log rendering
+    else:
+        pro_lock("Quiz History lets you review past attempts and track your progress.")
+
+# --- Past Papers tab (Pro) ---
+with selected_tab[2]:
+    if user_is_pro():
+        st.success("📄 Browse and practice with official past papers.")
+        # Placeholder for past paper integration
+    else:
+        pro_lock("Access full past papers with answer guides in the Pro version.")
+
+# --- Detailed Feedback tab (Pro) ---
+with selected_tab[3]:
+    if user_is_pro():
+        st.success("🧠 Advanced feedback and score breakdown will show here.")
+        # Placeholder for feedback module
+    else:
+        pro_lock("Detailed scoring and feedback help you focus your revision.")
 
 
 
