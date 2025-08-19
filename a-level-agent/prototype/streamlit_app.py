@@ -108,14 +108,23 @@ if "history" not in st.session_state:
 
 if "current_quiz" not in st.session_state:
     st.session_state["current_quiz"] = []
+
 if "quiz_index" not in st.session_state:
     st.session_state["quiz_index"] = 0
+
 if "quiz_answers" not in st.session_state:
     st.session_state["quiz_answers"] = []
+
 if "quiz_score" not in st.session_state:
     st.session_state["quiz_score"] = 0
+
 if "awaiting_quiz_answer" not in st.session_state:
     st.session_state["awaiting_quiz_answer"] = False
+
+# ✅ Pro-only: Initialize quiz_log safely
+if user_is_pro() and "quiz_log" not in st.session_state:
+    st.session_state["quiz_log"] = []
+
 
 # --- Question Form ---
 with st.form("question_form"):
