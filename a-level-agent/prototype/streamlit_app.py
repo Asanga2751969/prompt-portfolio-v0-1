@@ -128,6 +128,9 @@ if user_is_pro() and "quiz_log" not in st.session_state:
 
 # --- Question Form ---
 with st.form("question_form"):
+    if study_mode == "Quiz Mode":
+        st.info("📝 To start a quiz, please use the format: **'quiz me on [topic]'**\n\nE.g. `quiz me on momentum`")
+
     st.markdown("### ❓ Ask a Study Question or Answer a Quiz")
     user_input = st.text_area(
         "Enter your question or quiz answer below:",
@@ -135,6 +138,7 @@ with st.form("question_form"):
         placeholder="E.g. Explain the difference between mitosis and meiosis."
     )
     submitted = st.form_submit_button("Submit")
+
 
 # --- Handle Submission ---
 if submitted and user_input:
